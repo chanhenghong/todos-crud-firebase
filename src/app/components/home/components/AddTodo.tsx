@@ -13,18 +13,21 @@ const AddTodo = ({ todos }) => {
   // const gg = todos.forEach((todo) => console.log("forEach:::", todo));
   const handleSubmit = async (values) => {
     values.preventDefault();
-    // setDupli(false);
+    setDupli(false);
+    let a: Boolean = false;
     todos.forEach((todo1: any) => {
       if (todo1.todo == todo) {
         setDupli(true);
+        a = true;
+        console.log("a11::::", a);
         console.log("todo::", todo1.todo);
         console.log("todo2::", todo);
-        return;
+        console.log("dupli in IF::::", dupli);
       }
     });
-    console.log("dupli::::", dupli);
+    console.log("a::::", a);
     if (!todo) return;
-    if (dupli === true) return;
+    if (a == true) return;
 
     await addDoc(collection(db, "todos"), {
       todo,
