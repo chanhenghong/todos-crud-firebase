@@ -2,6 +2,7 @@ import { Stack, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import AddTodo from "./components/AddTodo";
 import TodoListing from "./components/TodoListing";
+import CircularProgress from "@mui/material/CircularProgress";
 import {
   collection,
   query,
@@ -14,14 +15,16 @@ import { db } from "@/config/firebase";
 
 const HomeTodo = () => {
   const [todos, setTodos] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   useEffect(() => {
     const q = query(collection(db, "todos"));
-    const unsub = onSnapshot(q, (querySnapshot) => {
+    onSnapshot(q, (querySnapshot) => {
       let todos: any = [];
       querySnapshot.forEach((doc) => {
         todos.push({ ...doc.data(), id: doc.id });
       });
       setTodos(todos);
+      setIsLoading(false);
     });
   }, []);
   const handleComplete = async (todo: any) => {
@@ -37,7 +40,7 @@ const HomeTodo = () => {
   const handleDelete = async (id: string) => {
     await deleteDoc(doc(db, "todos", id));
   };
-  
+
   return (
     <div>
       <Stack direction="column" justifyContent="center" alignItems="center">
@@ -51,8 +54,9 @@ const HomeTodo = () => {
         >
           All Tasks
         </Typography>
-        <AddTodo todos={todos}/>
+        <AddTodo todos={todos} />
         <Stack>
+          {isLoading && <CircularProgress />}
           {todos.map((todo: any) => (
             <TodoListing
               key={todo.id}

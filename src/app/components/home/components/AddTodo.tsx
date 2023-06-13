@@ -5,37 +5,41 @@ import { Button, Stack, TextField } from "@mui/material";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
+import SearchList from "./SearchList";
 
-const AddTodo = ({ todos }) => {
+interface IProps {
+  todos: any;
+}
+
+const AddTodo = (props: IProps) => {
+  const { todos } = props;
   const [todo, setTodo] = useState("");
-  const [dupli, setDupli] = useState(false);
-  console.log("todossss:::", todos);
-  // const gg = todos.forEach((todo) => console.log("forEach:::", todo));
-  const handleSubmit = async (values) => {
+  const [dupFlag, setDupFlag] = useState(Boolean);
+
+  //START: Filter array object TODO
+  const result = todos.filter((obj: any) => obj.todo.includes(todo));
+  //END:
+
+  const handleSubmit = async (values: any) => {
     values.preventDefault();
-    setDupli(false);
-    let a: Boolean = false;
+    let dupFlag: any = false;
     todos.forEach((todo1: any) => {
       if (todo1.todo == todo) {
-        setDupli(true);
-        a = true;
-        console.log("a11::::", a);
-        console.log("todo::", todo1.todo);
-        console.log("todo2::", todo);
-        console.log("dupli in IF::::", dupli);
+        dupFlag = true;
       }
     });
-    console.log("a::::", a);
     if (!todo) return;
-    if (a == true) return;
+    setDupFlag(dupFlag);
+    if (dupFlag == true) return;
 
     await addDoc(collection(db, "todos"), {
       todo,
       isCompleted: false,
-      createdAt: new Date(),
+      createdAt: Date.now(),
     });
     setTodo("");
   };
+
   return (
     <div>
       <Stack direction="row" spacing={2}>
@@ -46,13 +50,13 @@ const AddTodo = ({ todos }) => {
             "& > :not(style)": {
               m: 1,
               minWidth: 550,
-              height: 128,
+              minHeight: 128,
             },
           }}
         >
           <Paper elevation={2}>
             <Stack
-              direction="column"
+              direction="row"
               justifyContent="center"
               alignItems="center"
               spacing={1}
@@ -62,10 +66,19 @@ const AddTodo = ({ todos }) => {
                 id="outlined-basic"
                 label="Add Todo"
                 placeholder="..."
+                error={dupFlag == true ? true : false}
+                helperText={
+                  dupFlag == true ? "This todo is already exist!" : null
+                }
                 fullWidth
                 defaultValue={todo}
                 variant="outlined"
                 onChange={(e) => setTodo(e.target.value)}
+                onKeyPress={(e) => {
+                  if (e.key === "Enter") {
+                    handleSubmit(e);
+                  }
+                }}
               />
               <Stack
                 direction="row"
@@ -76,12 +89,14 @@ const AddTodo = ({ todos }) => {
                   onClick={handleSubmit}
                   variant="outlined"
                   size="small"
+                  sx={{ mr: 1 }}
                   startIcon={<AddCircleOutlineIcon />}
                 >
                   Add
                 </Button>
               </Stack>
             </Stack>
+            {todo != "" && <SearchList result={result} />}
           </Paper>
         </Box>
       </Stack>

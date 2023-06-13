@@ -55,9 +55,7 @@ export interface EditTodoProps {
 }
 const EditTodo = (props: EditTodoProps) => {
   const { open, handleClose, todo, handleEdit } = props;
-
   const [newTodo, setNewTodo] = useState("");
-  console.log("newTodo:::", newTodo);
 
   return (
     <div>
@@ -79,6 +77,11 @@ const EditTodo = (props: EditTodoProps) => {
             variant="outlined"
             defaultValue={todo.todo}
             onChange={(e) => setNewTodo(e.target.value)}
+            onKeyPress={(e) => {
+              if (e.key === "Enter") {
+                handleEdit(todo, newTodo);
+              }
+            }}
           />
         </DialogContent>
         <DialogActions>
