@@ -33,6 +33,7 @@ const HomeTodo = () => {
     });
   };
   const handleEdit = async (todo1: any, title: any) => {
+    console.log("title:::", title);
     await updateDoc(doc(db, "todos", todo1.id), {
       todo: title,
     });

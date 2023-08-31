@@ -6,6 +6,7 @@ import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
 import SearchList from "./SearchList";
+import ConfirmAdd from "./ConfirmAdd";
 
 interface IProps {
   todos: any;
@@ -29,10 +30,35 @@ const AddTodo = (props: IProps) => {
       }
     });
     if (!todo) return;
+    let a = todo.trim() === "";
+    if (a) return;
     setDupFlag(dupFlag);
-    if (dupFlag == true) return;
+    if (dupFlag == true) {
+      handleClickOpen();
+      return;
+    }
+    // if (dupFlag == true) return;
 
     await addDoc(collection(db, "todos"), {
+      todo,
+      isCompleted: false,
+      createdAt: Date.now(),
+    });
+    setTodo("");
+  };
+
+  const [open, setOpen] = useState(false);
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+  const handleClose = () => {
+    setOpen(false);
+  };
+  const hadleConfirmAdd = () => {
+    if (!todo) return;
+    let a = todo.trim() === "";
+    if (a) return;
+    addDoc(collection(db, "todos"), {
       todo,
       isCompleted: false,
       createdAt: Date.now(),
@@ -95,6 +121,11 @@ const AddTodo = (props: IProps) => {
                   Add
                 </Button>
               </Stack>
+              <ConfirmAdd
+                handleClose={handleClose}
+                open={open}
+                hadleConfirmAdd={hadleConfirmAdd}
+              />
             </Stack>
             {todo != "" && <SearchList result={result} />}
           </Paper>
